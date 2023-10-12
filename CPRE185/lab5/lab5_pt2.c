@@ -56,7 +56,7 @@ int main() {
             fflush(stdout);
         }
 
-        if(hasFallen == true && close_to(.5, 1, mag(gx, gy, gz)) == 1) {
+        if(hasFallen == true && close_to(.3, 1, mag(gx, gy, gz)) == 1) {
             final_t = t;
             delta_t = final_t - initial_t;
             converted_sec = delta_t/1000.0;
@@ -64,10 +64,6 @@ int main() {
             fd = fall_distance(converted_sec);
             // printf("%.3lf %.3lf %d %d %d", converted_sec, fd, initial_t, final_t, delta_t);
             printf("\nOuch! I fell %.3lf meters in %.3lf seconds", fd, converted_sec);
-
-
-
-
 
             break;
         }

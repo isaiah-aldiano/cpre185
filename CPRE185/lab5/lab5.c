@@ -56,7 +56,7 @@ int main() {
             fflush(stdout);
         }
 
-        if(hasFallen == true && close_to(.5, 1, mag(gx, gy, gz)) == 1) {
+        if(hasFallen == true &&  (close_to(.1, 1, mag(gx, gy, gz)) == 1 || mag(gx, gy, gz) > 1.2)) {
             final_t = t;
             delta_t = final_t - initial_t;
             converted_sec = delta_t/1000.0;

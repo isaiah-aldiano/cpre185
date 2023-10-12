@@ -21,17 +21,17 @@ int main() {
     bool hasFallen = false;
 
     int t, cnt_input, initial_t, final_t, delta_t, previous_t;
-    double gx, gy, gz, converted_sec, fd, acc_mag, f_velocity, test_distance;
+    double gx, gy, gz, converted_sec, fd, f_velocity, test_distance, percent_error;
 
 
     while(1) {
         scanf("%d, %lf, %lf, %lf, %lf, %lf, %lf", &t, &gx, &gy, &gz);
         
         //This variable increases to check if it should output a '.' for "I'm waiting..."
-        cnt_input++;
+        // cnt_input++;
 
-        if(close_to(.5, 1, mag(gx, gy, gz)) == 1 && cnt_input == 20 && waiting == true) {
-            cnt_input = 0;
+        if(close_to(.5, 1, mag(gx, gy, gz)) == 1 && t - previous_t > 100 && waiting == true) {
+            previous_t = t;
             printf(".");
             fflush(stdout);
 
@@ -46,33 +46,36 @@ int main() {
             fflush(stdout);
         }
 
-        if(close_to(.5, 1, mag(gx, gy, gz)) == 0 && mag(gx, gy, gz) < 1.1){
+        if(close_to(.5, 1, mag(gx, gy, gz)) == 0 && mag(gx, gy, gz) < 1 && close_to(2, 5, t/100 - previous_t/100) == 1){
             printf("!");
             fflush(stdout);
 
-            f_velocity = f_velocity + GRAVITY * (1 - mag(gx, gy, gz))*(t/1000 - previous_t/1000);
-            test_distance = test_distance + f_velocity*(t/1000 - previous_t/1000);
+            f_velocity = f_velocity + GRAVITY * (1 - mag(gx, gy, gz))*(t - previous_t)/1000;
+            test_distance = test_distance + f_velocity*(t - previous_t)/1000;
+            // printf("%lf", test_distance);
             previous_t = t; 
 
             
-        } else if(hasFallen == true && (close_to(.5, 1, mag(gx, gy, gz)) == 1 || mag(gx, gy, gz) > 1.5)) {
+        } else if(hasFallen == true && (close_to(.1, 1, mag(gx, gy, gz)) == 1 || mag(gx, gy, gz) > 1.2)) {
             final_t = t;
             delta_t = final_t - initial_t;
             converted_sec = delta_t/1000.0;
 
             fd = fall_distance(converted_sec);
-            printf("\nOuch! I fell %.3lf meters in %.3lf seconds", fd, converted_sec);
-            printf("\n%.5lf %.5lf %.5lf", f_velocity, test_distance, fabs(((test_distance - fd)/fd)));
-            
-            fflush(stdout);   
+            // test_distance /= 10;
+
+            percent_error = fd*(100 - test_distance)/100;
+            // percent_error = fabs(fd - (test_distance))/fabs(test_distance) * 100;
+
             break;
-        }
-
-        // printf("%.5lf %.5lf\n", mag(ax, ay, az), mag(gx, gy, gz));
-        
-
-          
+        }        
     }
+
+
+    printf("\nOuch! I fell %.3lf meters in %.3lf seconds", fd, converted_sec);
+    printf("\nCompensating for air resistance, the fall was %.3lf meters.\nThis is %.0lf%% less than computed.\n", percent_error, test_distance);
+    // printf("%d %d\n", final_t, initial_t);
+    fflush(stdout);   
 }
 
 
