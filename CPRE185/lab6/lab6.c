@@ -60,10 +60,10 @@ int main()
 	double roll_rad, pitch_rad;                 // value of the roll measured in radians
 	int scaled_value;                           // value of the roll adjusted to fit screen display
 	double selected;
-	int t, pt = 100;									// time
-	int pressed;
-	int mode = 1;
-	bool let_off = true;
+	int t, pt = 100;							// time
+	int pressed;								// determines button pressed
+	int mode = 1;								// mode selecter
+	bool let_off = true;						// mode selecter assistant variable
 
 	//insert any beginning needed code here
 
