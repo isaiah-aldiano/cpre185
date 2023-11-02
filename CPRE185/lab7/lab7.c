@@ -101,9 +101,16 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 
-		if (i == lengthofavg)
+		// printf("--------------------------------------------------------\n");
+
+		updatebuffer(x, i, gx);
+		updatebuffer(y, i, gy);
+		updatebuffer(z, i, gz);
+
+		i++;
+
+		if (i == lengthofavg - 1)
 		{
-			// printf("--------------------------------------------------------\n");
 			maxmin(x, lengthofavg, &xmax, &xmin);
 			maxmin(y, lengthofavg, &ymax, &ymin);
 			maxmin(z, lengthofavg, &zmax, &zmin);
@@ -116,12 +123,6 @@ int main(int argc, char *argv[])
 
 			i = 0;
 		}
-
-		updatebuffer(x, i, gx);
-		updatebuffer(y, i, gy);
-		updatebuffer(z, i, gz);
-
-		i++;
 
 		// printf("%d %lf %lf %lf\n", i, gx, gy, gz);
 
