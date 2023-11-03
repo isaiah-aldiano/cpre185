@@ -99,17 +99,6 @@ int main(int argc, char *argv[])
 
 		if (b4 == 1)
 		{
-			break;
-		}
-
-		updatebuffer(x, i, gx);
-		updatebuffer(y, i, gy);
-		updatebuffer(z, i, gz);
-
-		i++;
-
-		if (i >= lengthofavg)
-		{
 			for (int j = 0; j < i - lengthofavg; j++)
 			{
 				double *x0 = NULL;
@@ -141,41 +130,51 @@ int main(int argc, char *argv[])
 				free(y0);
 				free(z0);
 			}
+			break;
 		}
 
+		updatebuffer(x, i, gx);
+		updatebuffer(y, i, gy);
+		updatebuffer(z, i, gz);
+
+		i++;
+
+		// if (i >= lengthofavg)
+		// {
+			// for (int j = 0; j < i - lengthofavg; j++)
+			// {
+			// 	double *x0 = NULL;
+			// 	double *y0 = NULL;
+			// 	double *z0 = NULL;
+
+			// 	x0 = (double *)malloc(lengthofavg * sizeof(double));
+			// 	y0 = (double *)malloc(lengthofavg * sizeof(double));
+			// 	z0 = (double *)malloc(lengthofavg * sizeof(double));
+
+			// 	for (int k = 0; k < lengthofavg; k++)
+			// 	{
+			// 		x0[k] = x[j + k];
+			// 		y0[k] = y[j + k];
+			// 		z0[k] = z[j + k];
+			// 	}
+
+			// 	maxmin(x0, lengthofavg, &xmax, &xmin);
+			// 	maxmin(y0, lengthofavg, &ymax, &ymin);
+			// 	maxmin(z0, lengthofavg, &zmax, &zmin);
+
+			// 	xavg = avg(x0, lengthofavg);
+			// 	yavg = avg(y0, lengthofavg);
+			// 	zavg = avg(z0, lengthofavg);
+
+			// 	printf("%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", x[j], y[j], z[j], xavg, yavg, zavg, xmax, ymax, zmax, xmin, ymin, zmin);
+
+			// 	free(x0);
+			// 	free(y0);
+			// 	free(z0);
+			// }
+		// }
+
 	} while (1);
-
-	// for (int j = 0; j < i - lengthofavg; j++)
-	// {
-	// 	double *x0 = NULL;
-	// 	double *y0 = NULL;
-	// 	double *z0 = NULL;
-
-	// 	x0 = (double *)malloc(lengthofavg * sizeof(double));
-	// 	y0 = (double *)malloc(lengthofavg * sizeof(double));
-	// 	z0 = (double *)malloc(lengthofavg * sizeof(double));
-
-	// 	for (int k = 0; k < lengthofavg; k++)
-	// 	{
-	// 		x0[k] = x[j + k];
-	// 		y0[k] = y[j + k];
-	// 		z0[k] = z[j + k];
-	// 	}
-
-	// 	maxmin(x0, lengthofavg, &xmax, &xmin);
-	// 	maxmin(y0, lengthofavg, &ymax, &ymin);
-	// 	maxmin(z0, lengthofavg, &zmax, &zmin);
-
-	// 	xavg = avg(x0, lengthofavg);
-	// 	yavg = avg(y0, lengthofavg);
-	// 	zavg = avg(z0, lengthofavg);
-
-	// 	printf("%lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf, %lf\n", x[j], y[j], z[j], xavg, yavg, zavg, xmax, ymax, zmax, xmin, ymin, zmin);
-
-	// 	free(x0);
-	// 	free(y0);
-	// 	free(z0);
-	// }
 
 	return 0;
 }
