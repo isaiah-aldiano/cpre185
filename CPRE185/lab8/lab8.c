@@ -110,7 +110,7 @@ bool check_collison(int x, int y);
 
 bool check_collison(int x, int y)
 {
-	if (MAZE[y][x] == WALL)
+	if (MAZE[y][x] == WALL || x > 99 || x < 0)
 	{
 		return 1;
 	}
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 {
 	double gx, gy, gz;
 	int t_since_drop = 0, prev_t = 0, t = 0, curr_x = 49, temp_x, curr_y = 0;
-	bool on_ur, can_fall, cannot_fall;
+	bool on_ur, can_fall, cannot_fall, diag_fall_left, diag_fall_right;
 
 	if (argc < 2)
 	{
@@ -153,30 +153,57 @@ int main(int argc, char *argv[])
 		fscanf(stdin, "%d, %lf, %lf, %lf", &t, &gx, &gy, &gz);
 
 		// Is it time to move?  if so, then move avatar
-		if (prev_t + 750 < t)
+		if (prev_t + 150 < t)
 		{
 			// draw_maze();
 			prev_t = t;
 			temp_x = calc_roll(gx);
-			// curr_x += temp_x;
-			// if (curr_x < 0)
-			// {
-			// 	temp_x = 0;
-			// 	curr_x = 0;
-			// }
-			// else if (curr_x > 99)
-			// {
-			// 	temp_x = 0;
-			// 	curr_x = 99;
-			// }
 
 			can_fall = !check_collison(curr_x, curr_y + 1);
 			cannot_fall = check_collison(curr_x, curr_y + 1);
 			on_ur = check_collison(curr_x + temp_x, curr_y);
+			diag_fall_left = check_collison(curr_x - 1, curr_y + 1);
+			diag_fall_right = check_collison(curr_x + 1, curr_y + 1);
 
 			draw_character(curr_x, curr_y, EMPTY_SPACE);
 
-			if (can_fall)
+			if (temp_x == 1 && on_ur == 0 && diag_fall_right == 0)
+			{
+
+				curr_x += temp_x;
+				curr_y++;
+
+				if (curr_x > 99)
+				{
+					curr_x = 99;
+					draw_character(curr_x, curr_y, AVATAR);
+
+					t_since_drop = t;
+					continue;
+				}
+				else
+				{
+					draw_character(curr_x, curr_y, AVATAR);
+				}
+			}
+			else if (temp_x == -1 && on_ur == 0 && diag_fall_left == 0)
+			{
+				curr_x += temp_x;
+				curr_y++;
+
+				if (curr_x < 0)
+				{
+					curr_x = 0;
+					t_since_drop = t;
+					draw_character(curr_x, curr_y, AVATAR);
+					continue;
+				}
+				else
+				{
+					draw_character(curr_x, curr_y, AVATAR);
+				}
+			}
+			else if (can_fall)
 			{
 				curr_y++;
 				draw_character(curr_x, curr_y, AVATAR);
@@ -187,84 +214,19 @@ int main(int argc, char *argv[])
 				curr_x += temp_x;
 				draw_character(curr_x, curr_y, AVATAR);
 			}
-			// else if (cannot_fall && temp_x == -1 && on_ur == 0)
-			// {
-			// 	curr_x += temp_x;
-			// 	draw_character(curr_x, curr_y, AVATAR);
-			// }
-			// else if (t_since_drop + 7000 < t)
-			// {
-			// 	break;
-			// }
+			else if (t_since_drop + 7000 < t)
+			{
+				t_since_drop = -1;
+				break;
+			}
 			else if (cannot_fall && check_collison(curr_x + 1, curr_y) == 1 && check_collison(curr_x - 1, curr_y) == 1)
 			{
-				curr_y == 73;
+				curr_y = 73;
 			}
 			else if (cannot_fall)
 			{
 				draw_character(curr_x, curr_y, AVATAR);
 			}
-
-			// else if (cannot_fall && on_ur_left == 0)
-			// {
-			// 	draw_character(curr_x + temp_x, curr_y, AVATAR);
-			// }
-
-			/*
-				Need to check:
-				Left/right collision
-				Down collision
-				Diagonal left/right collision
-
-
-
-			*/
-			// TILTING to right
-
-			// can_fall = !check_collison(curr_x, curr_y + 1);
-			// cannot_fall = check_collison(curr_x, curr_y + 1);
-			// on_ur_left = check_collison(curr_x, curr_y);
-			// on_ur_right = check_collison(curr_x, curr_y);
-
-			// if (cannot_fall && on_ur_right)
-			// {
-			// 	// draw_character(curr_x - 1, curr_y, EMPTY_SPACE);
-
-			// 	draw_character(curr_x - 1, curr_y, AVATAR);
-			// }
-			// else if (cannot_fall && on_ur_left)
-			// {
-			// 	// draw_character(curr_x + 1, curr_y, EMPTY_SPACE);
-
-			// 	draw_character(curr_x + 1, curr_y, AVATAR);
-			// }
-			// // else if (cannot_fall)
-			// // {
-			// // 	draw_character(curr_x - temp_x, curr_y, EMPTY_SPACE);
-			// // 	draw_character(curr_x, curr_y, AVATAR);
-			// // }
-			// else if (can_fall)
-			// {
-			// 	draw_character(curr_x - temp_x, curr_y, EMPTY_SPACE);
-
-			// 	curr_y++;
-			// 	draw_character(curr_x, curr_y, AVATAR);
-			// }
-
-			// else if (check_collison(curr_x, curr_y + 1) && (check_collison(curr_x - 1, curr_y) || check_collison(curr_x + 1, curr_y)))
-			// {
-			// 	draw_character(curr_x, curr_y, AVATAR);
-			// }
-			// else if (!check_collison(curr_x, curr_y + 1) && (check_collison(curr_x - 1, curr_y) || check_collison(curr_x + 1, curr_y)))
-			// {
-			// 	curr_y++;
-			// 	draw_character(curr_x, curr_y, AVATAR);
-			// }
-			// else
-			// {
-			// 	curr_y++;
-			// 	draw_character(curr_x, curr_y, AVATAR);
-			// }
 
 			fflush(stdout);
 		}
@@ -275,6 +237,10 @@ int main(int argc, char *argv[])
 	if (curr_y == 72)
 	{
 		printf("YOU WIN!\n");
+	}
+	else if (t_since_drop == -1)
+	{
+		printf("STUCK IN A BUCKET EH?\n");
 	}
 	else if (curr_y == 73)
 	{
