@@ -10,6 +10,7 @@
 #include <ncurses/ncurses.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdbool.h>
 
 // Mathematical constants
 #define PI 3.14159
@@ -74,7 +75,8 @@ void draw_maze()
 	{
 		for (int i = 0; i < NUMCOLS; i++)
 		{
-			printf("%c", MAZE[j][i]);
+			// fscanf(stdout,"%c", MAZE[j][i]);
+			mvaddch(j, i, MAZE[j][i]);
 		}
 	}
 }
@@ -90,13 +92,27 @@ float calc_roll(float x_mag);
 
 float calc_roll(float x_mag)
 {
-	if (x_mag > 1 || x_mag > .6)
+	// LEFT
+	if (x_mag > .6)
+	{
+		return -1;
+	}
+	// RIGHT
+	else if (x_mag < -.6)
 	{
 		return 1;
 	}
-	else if (x_mag < -1 || x_mag < -.6)
+
+	return 0;
+}
+
+bool check_collison(int x, int y);
+
+bool check_collison(int x, int y)
+{
+	if (MAZE[y][x] == WALL)
 	{
-		return -1;
+		return 1;
 	}
 
 	return 0;
@@ -106,7 +122,8 @@ float calc_roll(float x_mag)
 int main(int argc, char *argv[])
 {
 	double gx, gy, gz;
-	int prev_t = 0, t, curr_x = 49, temp_x, curr_y = 0;
+	int t_since_drop = 0, prev_t = 0, t = 0, curr_x = 49, temp_x, curr_y = 0;
+	bool on_ur, can_fall, cannot_fall;
 
 	if (argc < 2)
 	{
@@ -114,52 +131,155 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 	int difficulty = atoi(argv[1]); // get difficulty from first command line arg
+
+	generate_maze(difficulty);
+
 	// setup screen
 	initscr();
 	refresh();
 
 	// Generate and draw the maze, with initial avatar
-	generate_maze(difficulty);
 	draw_maze();
+	refresh();
+	fflush(stdout);
 	// MAZE WON'T PRINT???
 
 	// Read gyroscope data to get ready for using moving averages.
-
 	// Event loop
 	do
 	{
 		// Read data, update average
-		scanf("%d, %lf, %lf, %lf", &t, &gx, &gy, &gz);
+		// scanf("%d, %lf, %lf, %lf", &t, &gx, &gy, &gz);
+		fscanf(stdin, "%d, %lf, %lf, %lf", &t, &gx, &gy, &gz);
 
 		// Is it time to move?  if so, then move avatar
-		if (prev_t + 1000 < t)
+		if (prev_t + 750 < t)
 		{
 			// draw_maze();
 			prev_t = t;
 			temp_x = calc_roll(gx);
-			curr_x -= temp_x;
-			if (curr_x < 0)
+			// curr_x += temp_x;
+			// if (curr_x < 0)
+			// {
+			// 	temp_x = 0;
+			// 	curr_x = 0;
+			// }
+			// else if (curr_x > 99)
+			// {
+			// 	temp_x = 0;
+			// 	curr_x = 99;
+			// }
+
+			can_fall = !check_collison(curr_x, curr_y + 1);
+			cannot_fall = check_collison(curr_x, curr_y + 1);
+			on_ur = check_collison(curr_x + temp_x, curr_y);
+
+			draw_character(curr_x, curr_y, EMPTY_SPACE);
+
+			if (can_fall)
 			{
-				curr_x = 0;
+				curr_y++;
+				draw_character(curr_x, curr_y, AVATAR);
+				t_since_drop = t;
 			}
-			else if (curr_x > 99)
+			else if (cannot_fall && (temp_x == 1 || temp_x == -1) && on_ur == 0)
 			{
-				curr_x = 99;
+				curr_x += temp_x;
+				draw_character(curr_x, curr_y, AVATAR);
+			}
+			// else if (cannot_fall && temp_x == -1 && on_ur == 0)
+			// {
+			// 	curr_x += temp_x;
+			// 	draw_character(curr_x, curr_y, AVATAR);
+			// }
+			// else if (t_since_drop + 7000 < t)
+			// {
+			// 	break;
+			// }
+			else if (cannot_fall && check_collison(curr_x + 1, curr_y) == 1 && check_collison(curr_x - 1, curr_y) == 1)
+			{
+				curr_y == 73;
+			}
+			else if (cannot_fall)
+			{
+				draw_character(curr_x, curr_y, AVATAR);
 			}
 
-			draw_character(curr_x + temp_x, curr_y, EMPTY_SPACE);
+			// else if (cannot_fall && on_ur_left == 0)
+			// {
+			// 	draw_character(curr_x + temp_x, curr_y, AVATAR);
+			// }
 
-			curr_y++;
+			/*
+				Need to check:
+				Left/right collision
+				Down collision
+				Diagonal left/right collision
 
-			draw_character(curr_x, curr_y, AVATAR);
+
+
+			*/
+			// TILTING to right
+
+			// can_fall = !check_collison(curr_x, curr_y + 1);
+			// cannot_fall = check_collison(curr_x, curr_y + 1);
+			// on_ur_left = check_collison(curr_x, curr_y);
+			// on_ur_right = check_collison(curr_x, curr_y);
+
+			// if (cannot_fall && on_ur_right)
+			// {
+			// 	// draw_character(curr_x - 1, curr_y, EMPTY_SPACE);
+
+			// 	draw_character(curr_x - 1, curr_y, AVATAR);
+			// }
+			// else if (cannot_fall && on_ur_left)
+			// {
+			// 	// draw_character(curr_x + 1, curr_y, EMPTY_SPACE);
+
+			// 	draw_character(curr_x + 1, curr_y, AVATAR);
+			// }
+			// // else if (cannot_fall)
+			// // {
+			// // 	draw_character(curr_x - temp_x, curr_y, EMPTY_SPACE);
+			// // 	draw_character(curr_x, curr_y, AVATAR);
+			// // }
+			// else if (can_fall)
+			// {
+			// 	draw_character(curr_x - temp_x, curr_y, EMPTY_SPACE);
+
+			// 	curr_y++;
+			// 	draw_character(curr_x, curr_y, AVATAR);
+			// }
+
+			// else if (check_collison(curr_x, curr_y + 1) && (check_collison(curr_x - 1, curr_y) || check_collison(curr_x + 1, curr_y)))
+			// {
+			// 	draw_character(curr_x, curr_y, AVATAR);
+			// }
+			// else if (!check_collison(curr_x, curr_y + 1) && (check_collison(curr_x - 1, curr_y) || check_collison(curr_x + 1, curr_y)))
+			// {
+			// 	curr_y++;
+			// 	draw_character(curr_x, curr_y, AVATAR);
+			// }
+			// else
+			// {
+			// 	curr_y++;
+			// 	draw_character(curr_x, curr_y, AVATAR);
+			// }
+
+			fflush(stdout);
 		}
-
-	} while (curr_y <= 72); // Change this to end game at right time
+	} while (curr_y < 72); // Change this to end game at right time
 
 	// Print the win message
 	endwin();
-
-	printf("YOU WIN!\n");
+	if (curr_y == 72)
+	{
+		printf("YOU WIN!\n");
+	}
+	else if (curr_y == 73)
+	{
+		printf("YOU LOOSE!\n");
+	}
 	return 0;
 }
 
